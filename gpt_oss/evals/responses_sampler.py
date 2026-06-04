@@ -17,7 +17,7 @@ class ResponsesSampler(SamplerBase):
         model: str,
         developer_message: str | None = None,
         temperature: float = 1.0,
-        max_tokens: int = 131_072,
+        max_tokens: int | None = None,
         reasoning_model: bool = False,
         reasoning_effort: str | None = None,
         base_url: str = "http://localhost:8000/v1",
@@ -46,8 +46,9 @@ class ResponsesSampler(SamplerBase):
                     "model": self.model,
                     "input": message_list,
                     "temperature": self.temperature,
-                    "max_output_tokens": self.max_tokens,
                 }
+                if self.max_tokens is not None:
+                    request_kwargs["max_output_tokens"] = self.max_tokens
                 if self.reasoning_model:
                     request_kwargs["reasoning"] = (
                         {"effort": self.reasoning_effort} if self.reasoning_effort else None

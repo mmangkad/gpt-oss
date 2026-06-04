@@ -22,7 +22,7 @@ class ChatCompletionsSampler(SamplerBase):
         model: str = "gpt-3.5-turbo",
         system_message: str | None = None,
         temperature: float = 0.5,
-        max_tokens: int = 1024,
+        max_tokens: int | None = None,
         reasoning_model: bool = False,
         reasoning_effort: str | None = None,
         base_url: str = "http://localhost:8000/v1",
@@ -47,21 +47,16 @@ class ChatCompletionsSampler(SamplerBase):
         trial = 0
         while True:
             try:
+                request_kwargs = {
+                    "model": self.model,
+                    "messages": message_list,
+                    "temperature": self.temperature,
+                }
+                if self.max_tokens is not None:
+                    request_kwargs["max_tokens"] = self.max_tokens
                 if self.reasoning_model:
-                    response = self.client.chat.completions.create(
-                        model=self.model,
-                        messages=message_list,
-                        reasoning_effort=self.reasoning_effort,
-                        temperature=self.temperature,
-                        max_tokens=self.max_tokens,
-                    )
-                else:
-                    response = self.client.chat.completions.create(
-                        model=self.model,
-                        messages=message_list,
-                        temperature=self.temperature,
-                        max_tokens=self.max_tokens,
-                    )
+                    request_kwargs["reasoning_effort"] = self.reasoning_effort
+                response = self.client.chat.completions.create(**request_kwargs)
 
                 choice = response.choices[0]
                 content = choice.message.content

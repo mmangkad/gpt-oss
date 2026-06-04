@@ -57,6 +57,12 @@ def main():
         help="Sampling temperature",
     )
     parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=None,
+        help="Maximum output tokens to request from the evaluated model. Omit to let the server choose.",
+    )
+    parser.add_argument(
         "--n-threads",
         type=int,
         default=1584,
@@ -82,7 +88,7 @@ def main():
                 reasoning_effort=reasoning_effort,
                 temperature=args.temperature,
                 base_url=args.base_url,
-                max_tokens=131_072,
+                max_tokens=args.max_tokens,
             )
 
     print(f"Running with args {args}")
